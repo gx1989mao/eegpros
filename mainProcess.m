@@ -1,9 +1,9 @@
 clc;clear;
-load('D:\myproj\eeg\数据\数据\脑电\2020_11_19_20_41_00-raw.mat');
+load('D:\myproj\eeg\数据\数据\脑电\2020_11_20_16_43_54-raw.mat');
 
 Fs = 250;
 
-win_step = 100;       % 窗口步进点个数
+win_step = 200;       % 窗口步进点个数
 win_width = Fs*30;  % 30s 一个窗口
 total_time = length(signals)-win_width-1; % 感兴趣信号长度
 % total_time = 10000;
