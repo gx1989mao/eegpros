@@ -10,18 +10,19 @@ x = [-0.5,0.5,-1.5,-0.8,  0,0.8,1.5,-2,  0,2,-1.5,0,  1.5,-0.5,0.5];
 y = [2,2,1.2,1.1,  1,1.1,1.2,0,   0,0,-1.2,-1,  -1.2,-2,-2];
 timepoint = 400;
 remove_ch = [2,3];
+E4_copy = E4;
+x(remove_ch) = [];y(remove_ch) = [];E4_copy(:,remove_ch,:) = [];
 
 figure;
 for i=1:4
-    z = E4(timepoint,:,i);
-    x(remove_ch) = [];y(remove_ch) = [];z(remove_ch) = [];
+    z = E4_copy(timepoint,:,i);
     [xi,yi] = meshgrid(-3:0.02:3);
     zi=griddata(x,y,z,xi,yi,'v4');
     zi(xi.^2+yi.^2>4)=nan;
     subplot(2,2,i);
     surf(xi,yi,zi,'EdgeColor','none');hold on;
     axis([-3, 3, -3, 3]);
-    plot3(x,y,ones(15).*111,'ro');hold on;
+    plot3(x,y,ones(length(z)).*111,'ro');hold on;
     view(0,90);grid off; colormap(jet);axis off;
 end
 figure;
