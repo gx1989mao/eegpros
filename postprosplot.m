@@ -19,13 +19,13 @@ tmp = find(signals(1,:)==10);
 M1 = tmp(1)/win_step;
 M2 = tmp(end)/win_step;
 
-%% 对该通道全部信号用emd无耻的滤波
-% imf0=pEMDandFFT(signals(channel,:),Fs);
-% input = zeros(1,length(signals));
-% input(1,:)= imf0(3,:);
+% 对该通道全部信号用emd无耻的滤波
+imf0=pEMDandFFT(signals(channel,:),Fs);
+input = zeros(1,length(signals));
+input(1,:)= imf0(3,:);
 %% 短时傅里叶变换时频图 
 % figure(2);
-% [ps] = spectrogram(input,win_width,7300,win_width,Fs,'yaxis');hold on;
+% [ps] = spectrogram(input,win_width,6000,win_width,Fs,'yaxis');hold on;
 % mesh(10*log10(abs(ps)/win_width));grid on;
 % tmp = find(signals(1,:)==10);
 % % plot3(tmp(1)/Fs/60,-1,100,'ro');hold on;
@@ -79,7 +79,7 @@ M2 = tmp(end)/win_step;
 %     plot(w,abs(F)); hold on;
 %     xlim([0,60]);
 % end
-
+% 
 
 %% 多通道 熵值 四频段相对能量 绘图
 
@@ -97,10 +97,10 @@ M2 = tmp(end)/win_step;
 
 
 %% mesh图 方便观察数据
+% % 
+% % E4(:,9,:)=[];
+% % En_all_channels(:,9)=[];
 % 
-% E4(:,9,:)=[];
-% En_all_channels(:,9)=[];
-
 % figure;
 % mesh(E4(:,:,1));hold on;title('E_delta');
 % plot3([0,0],[M1,M1],[0,max(max(E4(:,:,1)))],'r-','linewidth',4);hold on;
