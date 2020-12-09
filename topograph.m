@@ -9,9 +9,12 @@ load('E_all_bands-wavelet-200step.mat');
 x = [-0.5,0.5,-1.5,-0.8,  0,0.8,1.5,-2,  0,2,-1.5,0,  1.5,-0.5,0.5];
 y = [2,2,1.2,1.1,  1,1.1,1.2,0,   0,0,-1.2,-1,  -1.2,-2,-2];
 timepoint = 400;
+remove_ch = [2,3];
+
 figure;
 for i=1:4
     z = E4(timepoint,:,i);
+    x(remove_ch) = [];y(remove_ch) = [];z(remove_ch) = [];
     [xi,yi] = meshgrid(-3:0.02:3);
     zi=griddata(x,y,z,xi,yi,'v4');
     zi(xi.^2+yi.^2>4)=nan;
