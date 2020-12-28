@@ -22,7 +22,7 @@ E4 = zeros(win_N,15,5);
 % input = zeros(1,length(signals));
 % input(1,:)= imf0(3,:);
 tic;
-for ch =5
+for ch =3:17
     disp(ch);
     channel = ch;
     
@@ -104,13 +104,4 @@ toc;
 % E_theta = sum(E_wavelet(3:4));
 % E_alpha = sum(E_wavelet(5:7));
 % E_beta = sum(E_wavelet(8:13));
-
-
-% 画图出来看看5个波段的相对能量 ( 总和为100%) 
-figure;
-for i=1:5
-    subplot(5,1,i);
-    plot(E4(:,3,i));hold on;
-    ylim([0,100]);
-end
 
