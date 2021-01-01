@@ -19,8 +19,8 @@ x(remove_ch) = [];y(remove_ch) = [];InputChannels(remove_ch) = [];
     rectangle('Position', [2,-0.7,0.3,1.4], 'Curvature', [0.8 1],'LineWidth',3,'EdgeColor',[0,0,0]);hold on;
     
     
-    contourf(xi,yi,zi,6); hold on;
-    
+    contourf(xi,yi,zi,35); hold on;
+    caxis([-1 1]);
     
     % »­Ô² 
     r =2*R;%°ë¾¶

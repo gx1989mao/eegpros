@@ -68,7 +68,6 @@ for ch=1:length(channels)
     % 削峰
     Sig((Sig/V_count)>10e-6)=0*V_count;
     Sig((Sig/V_count)<-10e-6)=0*V_count;
-    
     % 标准差归一化
     sigma(ch,1) = std(Sig);
     Sig = Sig./std(Sig);
@@ -112,7 +111,6 @@ GFP = sqrt(sum((GFP_input-mean(alpha,2)).^2,1)./15);
 % GFP = sqrt(sum(tmp,1)./length(channels));
 
 startP = flag12(1);
-% startP = 74500;
 endP = flag12(end);
 select_sig = GFP(startP:endP);
 [y,x]=findpeaks(select_sig); 
@@ -135,17 +133,13 @@ title('GFP and peaks');
 raw_sig = zeros(length(channels),length(signals));
 
 
-
-
 % 要显示拓扑图的数据源
-% raw_sig(:,:) = signals(3:17,:);
-raw_sig(:,:) = alpha;
-% raw_sig(:,:) = input;
+raw_sig(:,:) = signals(3:17,:)-mean(signals(3:17,:),2);
+% raw_sig(:,:) = alpha-mean(alpha,2);
+% raw_sig(:,:) = input-mean(input,2);
 % sigma = std(raw_sig,0,2);%  求小波重构信号各通道标准差（一定要先削峰才准确）
 % norm_raw_sig = raw_sig./sigma;
 
-raw_sig = raw_sig./std(raw_sig,0,2);
-raw_sig = raw_sig-mean(raw_sig,2);
 
 %% 聚类
 Kmean_input = zeros(length(x),15);
@@ -156,7 +150,7 @@ end
 % 聚类 Idx存着分类标签 C存着K个类的聚类重心（可以认为是类的标准模板）
 K = 4;
 tic;
-[Idx,C]=kmeans(Kmean_input,K,'Replicates',300);
+[Idx,C]=kmeans(Kmean_input,K,'Replicates',1000);
 toc;
 disp('聚类完毕');
 
@@ -176,14 +170,14 @@ end
 %%  按聚类画图观察
 index = 1;
 for i=1:K
-%     figure(98);
-%     Idxtmp = x(Idx==i);
-%     RR = randperm(numel(Idxtmp));
-%     for j=x(RR(1:4)) % 从第一类中随机抽取四个
-%         subplot(4,4,index);
-%         myTopograph(raw_sig(:,startP-1+j));  hold on;title(['MS:',num2str(i)]);
-%         index = index+1;
-%     end
+    figure(98);
+    Idxtmp = x(Idx==i);
+    RR = randperm(numel(Idxtmp));
+    for j=x(RR(1:4)) % 从第一类中随机抽取四个
+        subplot(4,4,index);
+        myTopograph(raw_sig(:,startP-1+j));  hold on;title(['MS:',num2str(i)]);
+        index = index+1;
+    end
     
     figure(992);
     subplot(2,2,i);
