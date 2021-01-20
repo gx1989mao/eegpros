@@ -2,7 +2,13 @@
 clc;clear;
 close all;
 
-load('2020_11_21_16_22_48-raw.mat')
+
+root_path = 'D:\myproj\eeg\数据（处理1221）\ori\彩色\彩色\';
+flist = dir(root_path);
+fnum = length(flist)-2;
+i=1;
+load([root_path,flist(i+2).name]);
+% load('2020_11_21_16_22_48-raw.mat');
 % load('2020_11_17_19_19_14-raw.mat')  %左耳电极太亮了 有问题
 % load('2020_11_18_19_14_53-raw.mat')
 % load('2020_11_19_19_30_21-raw.mat') % 缺少6
@@ -23,29 +29,28 @@ V_count = 1.2* 8388607.0 * 1.5 * 51.0;
 
 flag10 = find(signals(1,:)==10);
 flag12 = find(signals(1,:)==12);  % 事件打标
-
+signals(3:17,:) = signals(3:17,:)./V_count./1e-6; % 转换为uV单位
 
 %% 小波重构取出来感兴趣频段 这里是alpha
 channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
-alpha = zeros(length(channels),length(signals)); % 小波重构信号
-input = alpha;%原始信号 emd滤波之后
-sigma = zeros(15,1);
-raw = signals(3:17,:);
+alpha = zeros(length(channels),length(signals));  % 小波重构信号
+input = alpha;                                    %原始信号 emd滤波之后
+
 for ch=1:length(channels)
 
-    % EMD滤波
-    imf0=pEMDandFFT(signals(channels(ch),:),Fs);close;
-    input(ch,:)= imf0(3,:);
+%     % EMD滤波
+%     imf0=pEMDandFFT(signals(channels(ch),:),Fs);close;
+%     input(ch,:)= imf0(3,:);
 
-%     % 巴特沃斯滤波
-%     res = signals(channels(ch),:);
-%     [n,Wn] = buttord(2*0.5/Fs,2*0.3/Fs,1,20);
-%     [bb,aa] = butter(n,Wn,'high');
-%     res = filter(bb,aa,res);
-%     [n,Wn] = buttord(2*45/Fs,2*48/Fs,1,20);
-%     [bb,aa] = butter(n,Wn,'low');
-%     res = filter(bb,aa,res);
-%     input(ch,:) = res;
+    % 巴特沃斯滤波
+    res = signals(channels(ch),:);
+    [n,Wn] = buttord(2*0.5/Fs,2*0.3/Fs,1,20);
+    [bb,aa] = butter(n,Wn,'high');
+    res = filter(bb,aa,res);
+    [n,Wn] = buttord(2*45/Fs,2*48/Fs,1,20);
+    [bb,aa] = butter(n,Wn,'low');
+    res = filter(bb,aa,res);
+    input(ch,:) = res;%%%%%%%%%%%%%%%%%%%%%%%
     
 
     Sig = input(ch,:);
@@ -62,69 +67,54 @@ for ch=1:length(channels)
     for node=1:16
         rcfs = rcfs + wprcoef(wpt,[6 nodes_ord(node)-1]);
     end
-    
-    Sig = rcfs;
-    
-    % 削峰
-    Sig((Sig/V_count)>10e-6)=0*V_count;
-    Sig((Sig/V_count)<-10e-6)=0*V_count;
-    
-    % 标准差归一化
-    sigma(ch,1) = std(Sig);
-    Sig = Sig./std(Sig);
-    
-    alpha(ch,:) = Sig;
-        
+    alpha(ch,:) = rcfs;%%%%%%%%%%%%%%%%%%%%%%%%%      
 end
 
 %% 各通道信号归一化绘图
-
-figure(1);
-for ch=1:length(channels)
-    plot(input(ch,:)+ch*3000);hold on;  % 简单滤波后信号
-end
-y_high = 464;
-line([flag10(1),flag10(1)],[0,y_high],'linewidth',3,'color','r'); hold on;
-line([flag10(end),flag10(end)],[0,y_high],'linewidth',3,'color','r'); hold on;
+y_high = 20*16;
+myALLChannelsPlot(input,10);
+line([flag12(1),flag12(1)],[0,y_high],'linewidth',3,'color','r'); hold on;
 line([flag12(end),flag12(end)],[0,y_high],'linewidth',3,'color','r'); hold on;
-% ylim([0,y_high]);
+line([flag12(end),flag12(end)],[0,y_high],'linewidth',3,'color','r'); hold on;
 title('预处理滤波后各通道信号');
 
-
-figure(11);
-for ch=1:length(channels)
-    plot(alpha(ch,:)+ch*16);hold on;  % alpha 小波重构
-end
-y_high = 464;
-line([flag10(1),flag10(1)],[0,y_high],'linewidth',3,'color','r'); hold on;
-line([flag10(end),flag10(end)],[0,y_high],'linewidth',3,'color','r'); hold on;
+myALLChannelsPlot(alpha,11);
+line([flag12(1),flag12(1)],[0,y_high],'linewidth',3,'color','r'); hold on;
 line([flag12(end),flag12(end)],[0,y_high],'linewidth',3,'color','r'); hold on;
-% ylim([0,y_high]);
+line([flag12(end),flag12(end)],[0,y_high],'linewidth',3,'color','r'); hold on;
 title('小波重构各通道信号');
 
 %%  GFP 计算 （使用alpha）
-
 GFP_input = alpha;
-
-GFP = sqrt(sum((GFP_input-mean(alpha,2)).^2,1)./15);
+%%
+myALLChannelsPlot(GFP_input,13);
+myALLChannelsPlot(input,14);
+%%
+GFP_input = myUniformSig(GFP_input);  % 各通道归一化 标准差做到1  均值到0 等同于重参考
+[GFP_input,cut] = myCutData(GFP_input,1.2); % 去掉所有大于标准差1.2倍的信号段
+input = myUniformSig(input);  % 各通道归一化 标准差做到1  均值到0 等同于重参考
+input(:,cut)=[];
+%%
+GFP = sqrt(sum((GFP_input-mean(GFP_input,2)).^2,1)./15);
 % GFP = movavg(GFP,40,40,'e');
 % GFP = medfilt1(GFP,20);
 % GFP = sqrt(sum(tmp,1)./length(channels));
 
-startP = flag12(1);
+startP = flag10(1);
 % startP = 74500;
-endP = flag12(end);
-select_sig = GFP(startP:endP);
+endP = flag10(end);
+select_sig = GFP(:);
 [y,x]=findpeaks(select_sig); 
 
 % 删掉过大的GFP点
-th = 2;
+th = 1;
 x(y>th)=[];
 y(y>th)=[];
 
 figure(2);
 plot(GFP);hold on;
-plot(x+startP,y,'r.');hold on;
+plot(x,y,'r.');hold on;
+ylim([0,th*1.5]);
 title('GFP and peaks');
 
 % 肉眼判断后删掉过于大的噪点
@@ -132,26 +122,21 @@ title('GFP and peaks');
 
 %% kmeans 聚类前操作 归一化
 
-raw_sig = zeros(length(channels),length(signals));
-
-
+raw_sig = zeros(length(channels),length(GFP_input));
 
 
 % 要显示拓扑图的数据源
 % raw_sig(:,:) = signals(3:17,:);
-raw_sig(:,:) = alpha;
-% raw_sig(:,:) = input;
-% sigma = std(raw_sig,0,2);%  求小波重构信号各通道标准差（一定要先削峰才准确）
-% norm_raw_sig = raw_sig./sigma;
+% raw_sig(:,:) = GFP_input;
+raw_sig(:,:) = input;
 
-raw_sig = raw_sig./std(raw_sig,0,2);
-raw_sig = raw_sig-mean(raw_sig,2);
+
 
 %% 聚类
 Kmean_input = zeros(length(x),15);
 % 感兴趣的GFP峰值点x写进聚类输入矩阵
 for i=1:length(x)
-    Kmean_input(i,:) = raw_sig(:,startP-1+x(i)); 
+    Kmean_input(i,:) = raw_sig(:,x(i)); 
 end
 % 聚类 Idx存着分类标签 C存着K个类的聚类重心（可以认为是类的标准模板）
 K = 4;

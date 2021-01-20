@@ -20,7 +20,7 @@ x(remove_ch) = [];y(remove_ch) = [];InputChannels(remove_ch) = [];
     
     
     contourf(xi,yi,zi,35); hold on;
-    caxis([-1 1]);
+    caxis([0 2]);  % 颜色显示范围设定 重要！
     
     % 画圆 
     r =2*R;%半径
