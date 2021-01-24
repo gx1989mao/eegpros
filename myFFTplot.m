@@ -1,5 +1,5 @@
 function [] = myFFTplot(Sig,figureNum)
-Fs = 250;
+Fs = 125;
 f=abs(fftshift(fft(Sig.^2)));             
 f = 10*log(f)/log(10);
 w=linspace(-Fs/2,Fs/2,length(Sig));  

@@ -6,7 +6,7 @@ close all;
 %% 全局参数
 Fs = 125;
 % win_step = 2000;       % 窗口步进点个数
-win_width = Fs*20;  % 30s 一个窗口
+win_width = Fs*15;  % 30s 一个窗口
 V_count = 1.2* 8388607.0 * 1.5 * 51.0;
 ch = 6;
 
@@ -27,7 +27,7 @@ INPUT = zeros(15,length(signals));
 for i=3:17
 
 % 对该通道全部信号用emd无耻的滤波
-imf0=pEMDandFFT(signals(i,:),Fs);close;
+imf0=pEMDandFFT(signals(i,:),Fs);
 INPUT(i-2,:)= (imf0(3,:))./V_count/1e-6;
     % 基础滤波
 
@@ -122,13 +122,11 @@ end
 
 
 %%
-win_width = Fs*5;  % 30s 一个窗口
 reref_data = CUTSIG;
-
 for i = 5
 
 fold = floor(0.8*win_width);
-[BJP,ff,tt] = spectrogrambjp(reref_data(i,:),win_width,fold,Fs);hold on;clc;
+[BJP,ff] = spectrogrambjp(reref_data(i,:),win_width,fold,Fs);hold on;clc;
 psbjp1 = BJP;
 psbjp1(450:end,:)=[];
 psbjp1(1:20,:)=[];
@@ -136,31 +134,22 @@ psbjp1(1:20,:)=[];
 psbjp1 = psbjp1-max(max(psbjp1)); % 归一化
 % [CLI] = myEwaveletWins(reref_data,win_width,fold);
 [CLI] = myWorkLoad(reref_data,win_width,fold);
-end
 
-%% 插值 画图 
-interpz_scale = 5; % 插值倍数 1倍就是不插值
-SS = size(psbjp1);
-x = 1:SS(2);
-y = 1:SS(1);
+y=ff;
+x=linspace(-5,5,5)
 [X,Y]=meshgrid(x,y);
-xx = 1:1/interpz_scale:SS(2);
-yy = 1:1/interpz_scale:SS(1);
-[XX,YY]=meshgrid(xx,yy);
-psbjp2=interp2(X,Y,psbjp1,XX,YY,'cubic');
-CLI1 = interp1(T,CLI,'cubic');
-
+ZZ=interp2(X,Y,Z,XX,YY,'cubic');
 figure;
 subplot(211);
-surface(XX,YY,psbjp2,'LineStyle','none');hold on;view(0,90);grid off;%caxis([-30 0]);
+surface(psbjp1,'LineStyle','none');hold on;view(0,90);grid off;%caxis([-30 0]);
 
-% contourf(XX,YY,psbjp1);hold on;
+% contourf(psbjp1);hold on;
 
 subplot(212);
-plot(medfilt1(CLI1,1)*250,'b-','linewidth',1);hold on;
+plot(medfilt1(CLI,20)*250,'w-','linewidth',1);hold on;
 
 
-% end
+end
 
 
 
