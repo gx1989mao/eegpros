@@ -10,7 +10,8 @@ win_width = Fs*20;  % 30s 一个窗口
 V_count = 1.2* 8388607.0 * 1.5 * 51.0;
 ch = 6;
 
-root_path = 'D:\myproj\eeg\数据（处理1221）\ori\黑白\黑白\';
+% root_path = 'D:\myproj\eeg\数据（处理1221）\ori\黑白\黑白\';
+root_path = 'D:\myproj\eeg\数据（处理1221）\ori\彩色\彩色\';
 flist = dir(root_path);
 
 fnum = length(flist)-2;
@@ -43,7 +44,7 @@ end
 
 tmp = find(signals(1,:)==12);
 INPUT(:,1:tmp(1))=[]; % 强行截掉没有实验的部分 对齐
-
+%%
 figure;
 for i=1:15
     plot(INPUT(i,:)-i*20+10);hold on;
@@ -52,7 +53,7 @@ end
 %%  平均重参考 和eeglab的功能验证过 ok
 
 REF = INPUT;
-REF(14,:) = []; % 去掉14通道 干扰太大了
+% REF(14,:) = []; % 去掉14通道 干扰太大了
 
 figure;
 for i=1:15
@@ -121,7 +122,7 @@ end
 
 
 
-%%
+%% 时频图
 win_width = Fs*5;  % 30s 一个窗口
 reref_data = CUTSIG;
 
@@ -129,6 +130,7 @@ for i = 5
 
 fold = floor(0.8*win_width);
 [BJP,ff,tt] = spectrogrambjp(reref_data(i,:),win_width,fold,Fs);hold on;clc;
+%%
 psbjp1 = BJP;
 psbjp1(450:end,:)=[];
 psbjp1(1:20,:)=[];
@@ -148,7 +150,7 @@ xx = 1:1/interpz_scale:SS(2);
 yy = 1:1/interpz_scale:SS(1);
 [XX,YY]=meshgrid(xx,yy);
 psbjp2=interp2(X,Y,psbjp1,XX,YY,'cubic');
-CLI1 = interp1(T,CLI,'cubic');
+CLI1 = interp1(XX,CLI,'cubic');
 
 figure;
 subplot(211);
@@ -162,5 +164,43 @@ plot(medfilt1(CLI1,1)*250,'b-','linewidth',1);hold on;
 
 % end
 
+% %% kmeans
+% win_width = Fs*5;  % 30s 一个窗口
+% fold = floor(0.8*win_width);
+% IDX = [];
+% for ch = 1:2
+%      [Ewavelet] = myEwaveletWins(CUTSIG(ch,:),win_width,fold);
+%      [Idx,C]=kmeans(Ewavelet',2);
+%      IDX = [IDX,Idx];
+% end
+% 
+% 
+% %%
+% figure(1001);
+% III = IDX';
+% for ch=1:2
+% plot(III(ch,:)+ch*2.5);hold on;
+% 
+% end
+% %%
+% figure(1001);
+% plot(III(1,:)+1*2.5);hold on;
+% plot(III(2,:)+2*2.5);hold on;
 
+%% wavelet feature
+win_width = Fs*5;  
+fold = floor(0.8*win_width);
+IDX = [];
+for ch = [13,15]
+     [Ewavelet] = myEwaveletWins(CUTSIG(ch,:),win_width,fold);
+     IDX = [IDX;Ewavelet(3,:)];
+end
+for ch = 8:9
+     [Ewavelet] = myEwaveletWins(CUTSIG(ch,:),win_width,fold);
+     IDX = [IDX;Ewavelet(4,:)];
+end
+for ch = [1,3,10]
+     [Ewavelet] = myEwaveletWins(CUTSIG(ch,:),win_width,fold);
+     IDX = [IDX;Ewavelet(5,:)];
+end
 
