@@ -1,9 +1,9 @@
 function [Z] = ISOPROC(IDX,w)
-IDX1 = IDX;
+IDX1 = IDX_ApEn;
 figure;
 for i=1:7  
   IDX1(i,:) = medfilt1(IDX(i,:),w);
-%   plot(IDX1(i,4:end));hold on;
+  plot(IDX1(i,4:end));hold on;
 end
 IDX1(:,1:w)=[];
 IDX1(:,end-w:end)=[];
@@ -43,7 +43,7 @@ for i = 1 : m
             if D(j,i)~=inf
                 D(i,j) = D(j,i);
             else
-                D(i,j) = 10000;
+                D(i,j) = 2;
             end
             
         end
