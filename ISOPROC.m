@@ -1,10 +1,11 @@
 function [Z] = ISOPROC(IDX,w)
-IDX1 = IDX_ApEn;
-figure;
-for i=1:7  
-  IDX1(i,:) = medfilt1(IDX(i,:),w);
-  plot(IDX1(i,4:end));hold on;
-end
+% IDX1 = IDX_ApEn;
+IDX1 = IDX;
+% figure;
+% for i=1:7
+%   IDX1(i,:) = medfilt1(IDX(i,:),w);
+% %   plot(IDX1(i,4:end));hold on;
+% end
 IDX1(:,1:w)=[];
 IDX1(:,end-w:end)=[];
 %%

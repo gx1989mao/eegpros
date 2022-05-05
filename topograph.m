@@ -3,7 +3,7 @@ clear;
 close all;
 
 % load('E_all_bands-wavelet-200step.mat');
-load('D:\myproj\eeg\数据（处理1221）\数据（处理1221）\黑白\2020_11_02_20_04_37-feature.mat')
+load('.\数据（处理1221）\数据（处理1221）\黑白\2020_11_02_20_04_37-feature.mat')
 
 E4_copy = E4;
 timepoint = 200;
